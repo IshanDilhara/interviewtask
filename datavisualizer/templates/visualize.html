@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #35424a;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+{% load custom_filters %}  <!-- Load custom filters here -->
+
+<h1>Data Visualization</h1>
+
+<table>
+    <thead>
+        <tr>
+            {% for field in fields %}
+                <th>{{ field.verbose_name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+            <tr>
+                {% for field in fields %}
+                    <td>{{ row|getattr:field.name }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<canvas id="myChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    
+    const myChart = new Chart(ctx, {
+        type: 'bar', // Change this to 'line', 'pie', etc., for different chart types
+        data: {
+            labels: [
+                {% for row in data %}
+                    "{{ row.some_field }}",  // Replace `some_field` with the actual field for the x-axis labels
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'My Dataset', // Customize this label
+                data: [
+                    {% for row in data %}
+                        {{ row.another_field }},  // Replace `another_field` with the actual field for the y-axis values
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
